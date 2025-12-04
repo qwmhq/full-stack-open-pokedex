@@ -57,7 +57,7 @@ jobs:
       - name: debug
         env:
           SKIP: ${{ contains(join(github.event.commits.*.message, ','), '#skip') }}
-        run: echo "$SKIP" && echo "$COMMIT_MESSAGES"
+        run: echo "$SKIP"
   # tag_release:
   #   if: ${{ github.event_name == 'push' }}
   #   needs: [lint_and_test]
@@ -77,4 +77,3 @@ jobs:
   #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   #         TAG_PREFIX: v
   #         DEFAULT_BUMP: patch
-
