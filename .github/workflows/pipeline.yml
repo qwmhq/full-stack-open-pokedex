@@ -9,7 +9,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  simple_deployment_pipeline:
+  lint_and_test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,9 +24,27 @@ jobs:
         run: npm run build
       - name: test
         run: npm run test
+  deploy_to_render:
+    if: ${{ github.event_name == 'push' }}
+    needs: [lint_and_test]
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to Render
-        if: ${{ github.event_name == 'push' }}
         uses: sws2apps/render-deployment@v2.0.0
         with:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
           apiKey: ${{ secrets.RENDER_API_KEY }}
+  tag_release:
+    needs: [lint_and_test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bump version and push tag
+        if: ${{ github.event_name == 'push' }}
+        permissions:
+          contents: write
+        uses: anothrNic/github-tag-action@1.75.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_PREFIX: v
+          DEFAULT_BUMP: patch
+
