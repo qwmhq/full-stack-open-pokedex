@@ -1,7 +1,7 @@
 name: Deployment pipeline
 
 env:
-  SKIP_VERSION_TAG: ${{ contains(join(github.event.commits.*.message, ','), '#skip') }}
+  SKIP_VERSION_TAG: ${{ contains(join(github.event.commits.*.message, ','), '#skip') || github.event_name != 'push' }}
 
 on:
   push:
@@ -38,7 +38,7 @@ jobs:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
           apiKey: ${{ secrets.RENDER_API_KEY }}
   tag_release:
-    if: ${{ github.event_name == 'push' && env.SKIP_VERSION_TAG == 'false' }}
+    if: ${{ env.SKIP_VERSION_TAG == 'false' }}
     needs: [lint_and_test]
     runs-on: ubuntu-latest
     permissions:
