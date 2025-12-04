@@ -25,7 +25,8 @@ jobs:
       - name: test
         run: npm run test
   deploy_to_render:
-    if: ${{ github.event_name == 'push' }}
+    # if a pr is being merged and isn't tagged with `#skip`
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ','), '#skip') }}
     needs: [lint_and_test]
     runs-on: ubuntu-latest
     steps:
@@ -35,8 +36,7 @@ jobs:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
           apiKey: ${{ secrets.RENDER_API_KEY }}
   tag_release:
-    # if a pr is being merged and isn't tagged with #skip
-    if: ${{ github.event_name != 'push' && !contains(join(github.event.commits.*.message, ','), '#skip') }}
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ','), '#skip') }}
     needs: [lint_and_test]
     runs-on: ubuntu-latest
     permissions:
