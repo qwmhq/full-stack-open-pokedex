@@ -37,11 +37,11 @@ jobs:
   tag_release:
     needs: [lint_and_test]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Bump version and push tag
         if: ${{ github.event_name == 'push' }}
-        permissions:
-          contents: write
         uses: anothrNic/github-tag-action@1.75.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
