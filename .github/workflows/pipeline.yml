@@ -35,14 +35,14 @@ jobs:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
           apiKey: ${{ secrets.RENDER_API_KEY }}
   tag_release:
+    if: ${{ github.event_name == 'push' }}
     needs: [lint_and_test]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - name: Bump version and push tag
-        if: ${{ github.event_name == 'push' }}
-        uses: anothrNic/github-tag-action@1.75.0
+        uses: anothrNick/github-tag-action@1.75.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_PREFIX: v
