@@ -1,8 +1,5 @@
 name: Deployment pipeline
 
-env:
-  SKIP_VERSION_TAG: ${{ contains(join(github.event.commits.*.message, ','), '#skip') }}
-
 on:
   push:
     branches:
@@ -38,7 +35,8 @@ jobs:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
           apiKey: ${{ secrets.RENDER_API_KEY }}
   tag_release:
-    if: ${{ github.event_name == 'push' }}
+    # if a pr is being merged and isn't tagged with #skip
+    if: ${{ github.event_name != 'push' && !contains(join(github.event.commits.*.message, ','), '#skip') }}
     needs: [lint_and_test]
     runs-on: ubuntu-latest
     permissions:
@@ -48,7 +46,6 @@ jobs:
         with:
           fetch-depth: '0'
       - name: Bump version and push tag
-        if: ${{ env.SKIP_VERSION_TAG == 'false' }}
         uses: anothrNick/github-tag-action@1.75.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
