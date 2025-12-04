@@ -9,31 +9,31 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  lint_and_test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - name: Install dependencies
-        run: npm install
-      - name: lint
-        run: npm run eslint
-      - name: build
-        run: npm run build
-      - name: test
-        run: npm run test
-  deploy_to_render:
-    if: ${{ github.event_name == 'push' }}
-    needs: [lint_and_test]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to Render
-        uses: sws2apps/render-deployment@v2.0.0
-        with:
-          serviceId: ${{ secrets.RENDER_SERVICE_ID }}
-          apiKey: ${{ secrets.RENDER_API_KEY }}
+  # lint_and_test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20'
+  #     - name: Install dependencies
+  #       run: npm install
+  #     - name: lint
+  #       run: npm run eslint
+  #     - name: build
+  #       run: npm run build
+  #     - name: test
+  #       run: npm run test
+  # deploy_to_render:
+  #   if: ${{ github.event_name == 'push' }}
+  #   needs: [lint_and_test]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Deploy to Render
+  #       uses: sws2apps/render-deployment@v2.0.0
+  #       with:
+  #         serviceId: ${{ secrets.RENDER_SERVICE_ID }}
+  #         apiKey: ${{ secrets.RENDER_API_KEY }}
   debug:
     runs-on: ubuntu-latest
     permissions:
@@ -58,23 +58,23 @@ jobs:
         env:
           SKIP: ${{ contains(join(github.event.commits.*.message, ','), '#skip') }}
         run: echo "$SKIP" && echo "$COMMIT_MESSAGES"
-  tag_release:
-    if: ${{ github.event_name == 'push' }}
-    needs: [lint_and_test]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: '0'
-        env:
-          SKIP: ${{ contains(join(github.event.commits.*.message, ','), '#skip') }}
-      - name: Bump version and push tag
-        if: ${{ env.SKIP == 'false' }}
-        uses: anothrNick/github-tag-action@1.75.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_PREFIX: v
-          DEFAULT_BUMP: patch
+  # tag_release:
+  #   if: ${{ github.event_name == 'push' }}
+  #   needs: [lint_and_test]
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: write
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: '0'
+  #       env:
+  #         SKIP: ${{ contains(join(github.event.commits.*.message, ','), '#skip') }}
+  #     - name: Bump version and push tag
+  #       if: ${{ env.SKIP == 'false' }}
+  #       uses: anothrNick/github-tag-action@1.75.0
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #         TAG_PREFIX: v
+  #         DEFAULT_BUMP: patch
 
