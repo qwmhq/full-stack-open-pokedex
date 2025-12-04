@@ -34,6 +34,19 @@ jobs:
         with:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
           apiKey: ${{ secrets.RENDER_API_KEY }}
+  debug:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+      - name: debug
+        env:
+          SKIP: ${{ contains(join(github.event.commits.*.message, ','), '#skip') }}
+          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
+        run: echo "$SKIP" && echo "$COMMIT_MESSAGES"
   tag_release:
     if: ${{ github.event_name == 'push' }}
     needs: [lint_and_test]
